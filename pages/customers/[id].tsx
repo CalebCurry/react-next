@@ -3,6 +3,9 @@ import { useRouter } from 'next/router';
 import { Customer } from './index';
 import axios, { AxiosError } from 'axios';
 import { ParsedUrlQuery } from 'querystring';
+import clientPromise from '../../lib/mongodb';
+import { ObjectId } from 'mongodb';
+import { BSONTypeError } from 'bson';
 
 type Props = {
     customer?: Customer;
@@ -32,28 +35,36 @@ export const getStaticProps: GetStaticProps<Props, Params> = async (
     const params = context.params!;
 
     try {
-        const result = await axios.get<{ customer: Customer }>(
-            `http://127.0.0.1:8000/api/customers/${params.id}`
-        );
+        const mongoClient = await clientPromise;
+
+        const data = (await mongoClient
+            .db()
+            .collection('customers')
+            .findOne({ _id: new ObjectId(params.id) })) as Customer;
+
+        console.log('!!!', data);
+
+        if (!data) {
+            return {
+                notFound: true,
+                revalidate: 60,
+            };
+        }
 
         return {
             props: {
-                customer: result.data.customer,
+                customer: JSON.parse(JSON.stringify(data)),
             },
             revalidate: 60,
         };
     } catch (err) {
-        if (err instanceof AxiosError) {
-            if (err.response?.status === 404) {
-                return {
-                    notFound: true,
-                    revalidate: 60,
-                };
-            }
+        console.log(err);
+        if (err instanceof BSONTypeError) {
+            return {
+                notFound: true,
+            };
         }
-        return {
-            props: {},
-        };
+        throw err;
     }
 };
 
@@ -63,7 +74,7 @@ const Customer: NextPage<Props> = (props) => {
         return <p>Loading...</p>;
     }
 
-    return <h1>Customer {props.customer ? props.customer.name : null}</h1>;
+    return <h1>{props.customer ? 'Customer' + props.customer.name : null}</h1>;
 };
 
 export default Customer;
