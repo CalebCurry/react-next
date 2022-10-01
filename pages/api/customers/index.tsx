@@ -6,14 +6,14 @@ type Return = {
     customers: Customer[];
 };
 
-export const getCustomers = async () => {
+export const getCustomers = async (): Promise<Customer[]> => {
     const mongoClient = await clientPromise;
 
-    const data = await mongoClient
+    const data = (await mongoClient
         .db()
         .collection('customers')
         .find()
-        .toArray();
+        .toArray()) as Customer[];
 
     return JSON.parse(JSON.stringify(data));
 };
