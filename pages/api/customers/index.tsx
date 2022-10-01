@@ -38,9 +38,6 @@ export default async (
         const data = await getCustomers();
         res.status(200).json({ customers: data });
     } else if (req.method === 'POST') {
-        //expect a customer to be sent with the request
-        console.log(req.body);
-
         if (req.body.name && req.body.industry) {
             const customer: Customer = {
                 name: req.body.name,
@@ -48,6 +45,8 @@ export default async (
             };
 
             const insertedId = await addCustomer(customer);
+            res.revalidate('/customers');
+            res.revalidate('/customers/' + insertedId);
             res.status(200).json(insertedId);
         } else {
             res.status(400).json({ error: 'name and industry are required.' });
