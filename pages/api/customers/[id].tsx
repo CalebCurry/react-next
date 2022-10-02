@@ -15,17 +15,58 @@ export const getCustomer = async (id: string | ObjectId): Promise<Customer> => {
     return data;
 };
 
+export const editCustomer = async (
+    id: string | ObjectId,
+    customer: Customer
+) => {
+    id = typeof id === 'string' ? new ObjectId(id) : id;
+    const mongoClient = await clientPromise;
+
+    return await mongoClient
+        .db()
+        .collection('customers')
+        .replaceOne({ _id: id }, customer);
+};
+
+export const deleteCustomer = async (id: string | ObjectId) => {
+    id = typeof id === 'string' ? new ObjectId(id) : id;
+    const mongoClient = await clientPromise;
+
+    return await mongoClient
+        .db()
+        .collection('customers')
+        .deleteOne({ _id: id });
+};
+
 export default async (
     req: NextApiRequest,
-    res: NextApiResponse<{ customer: Customer } | string>
+    res: NextApiResponse<
+        | { modifiedCount: number }
+        | { customer: Customer }
+        | { error: string }
+        | { deletedCount: number }
+    >
 ) => {
     const id = req.query.id!;
 
-    const data = await getCustomer(new ObjectId(id as string));
+    if (req.method === 'GET') {
+        const data = await getCustomer(id as string);
 
-    if (!data) {
-        res.status(404).json('Customer not found');
+        if (!data) {
+            res.status(404).json({ error: 'Customer not found' });
+        }
+
+        res.status(200).json({ customer: data });
+    } else if (req.method === 'PUT') {
+        const data = await editCustomer(id as string, {
+            name: req.body.name,
+            industry: req.body.industry,
+        });
+
+        res.status(200).json({ modifiedCount: data.modifiedCount });
+    } else if (req.method === 'DELETE') {
+        const data = await deleteCustomer(id as string);
+
+        res.status(200).json({ deletedCount: data.deletedCount });
     }
-
-    res.status(200).json({ customer: data });
 };
