@@ -4,6 +4,7 @@ import { MongoClient, ObjectId } from 'mongodb';
 import clientPromise from '../../lib/mongodb';
 import { getCustomers } from '../api/customers/index';
 import { useQuery } from '@tanstack/react-query';
+import Button from '@mui/material/Button';
 
 export type Customer = {
     _id?: ObjectId;
@@ -43,6 +44,7 @@ const Customers: NextPage = ({
                             <p>{customer.name}</p>
                             <p>{customer.industry}</p>
                             <p>{customer._id?.toString()}</p>
+                            <Button variant="contained">View Orders</Button>
                         </div>
                     );
                 })}
