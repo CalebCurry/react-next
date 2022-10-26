@@ -8,10 +8,7 @@ import { Customer } from '../pages/customers';
 
 const Customer = ({ customer }: { customer: Customer }) => {
     return (
-        <div
-            key={customer._id?.toString()}
-            style={{ marginBottom: 40, padding: 10 }}
-        >
+        <div style={{ marginBottom: 40, padding: 10 }}>
             <span
                 style={{
                     display: 'flex',
