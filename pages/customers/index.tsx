@@ -6,6 +6,8 @@ import { getCustomers } from '../api/customers/index';
 import { useQuery } from '@tanstack/react-query';
 
 import CustomerComponent from '../../components/Customer';
+import Grid from '@mui/material/Grid';
+import Container from '@mui/material/Container';
 
 export type Customer = {
     _id?: ObjectId;
@@ -37,17 +39,18 @@ const Customers: NextPage = ({
 
     if (customers) {
         return (
-            <>
-                <h1>Customers</h1>
-                {customers.map((customer: Customer) => {
-                    return (
-                        <CustomerComponent
-                            key={customer._id?.toString()}
-                            customer={customer}
-                        />
-                    );
-                })}
-            </>
+            <Container>
+                <Grid container spacing={5} sx={{ mt: 1 }}>
+                    {customers.map((customer: Customer) => {
+                        return (
+                            <CustomerComponent
+                                key={customer._id?.toString()}
+                                customer={customer}
+                            />
+                        );
+                    })}
+                </Grid>
+            </Container>
         );
     }
 
