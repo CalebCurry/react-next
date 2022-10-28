@@ -9,10 +9,17 @@ import CustomerComponent from '../../components/Customer';
 import Grid from '@mui/material/Grid';
 import Container from '@mui/material/Container';
 
+export type Order = {
+    description: string;
+    price: { $numberDecimal: string };
+    _id: ObjectId;
+};
+
 export type Customer = {
     _id?: ObjectId;
     name: string;
     industry: string;
+    orders: Order[];
 };
 
 export const getStaticProps: GetStaticProps = async (context) => {
