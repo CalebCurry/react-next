@@ -1,7 +1,7 @@
 import { ObjectId } from 'mongodb';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import clientPromise from '../../../lib/mongodb';
-import { Customer } from '../../customers/index';
+import { Customer, Order } from '../../customers/index';
 import NextCors from 'nextjs-cors';
 
 type Return = {
@@ -52,6 +52,9 @@ export default async (
             const customer: Customer = {
                 name: req.body.name,
                 industry: req.body.industry,
+                orders: req.body.orders.map((order: Order) => {
+                    return { ...order, _id: new ObjectId() };
+                }),
             };
 
             const insertedId = await addCustomer(customer);
