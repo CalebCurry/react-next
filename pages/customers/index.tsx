@@ -22,7 +22,10 @@ export type Customer = {
     orders?: Order[];
 };
 
-export const getStaticProps: GetStaticProps = async (context) => {
+type Props = {
+    customers: Customer[];
+};
+export const getStaticProps: GetStaticProps<Props> = async (context) => {
     const data = await getCustomers();
     console.log(data);
 
@@ -34,16 +37,13 @@ export const getStaticProps: GetStaticProps = async (context) => {
     };
 };
 
-const Customers: NextPage = ({
-    customers: c,
-}: InferGetStaticPropsType<typeof getStaticProps>) => {
+const Customers: NextPage<Props> = ({ customers: c }) => {
     console.log(c);
-    const { data: { data: { customers = [] } = {} } = {} } = useQuery(
+    const { data: { data: { customers = c } = {} } = {} } = useQuery(
         ['customers'],
         () => {
             return axios('/api/customers');
-        },
-        { initialData: c }
+        }
     );
 
     return (
