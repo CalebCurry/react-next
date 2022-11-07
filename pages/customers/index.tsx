@@ -24,6 +24,7 @@ export type Customer = {
 
 export const getStaticProps: GetStaticProps = async (context) => {
     const data = await getCustomers();
+    console.log(data);
 
     return {
         props: {
@@ -34,8 +35,9 @@ export const getStaticProps: GetStaticProps = async (context) => {
 };
 
 const Customers: NextPage = ({
-    c,
+    customers: c,
 }: InferGetStaticPropsType<typeof getStaticProps>) => {
+    console.log(c);
     const { data: { data: { customers = [] } = {} } = {} } = useQuery(
         ['customers'],
         () => {
@@ -44,24 +46,20 @@ const Customers: NextPage = ({
         { initialData: c }
     );
 
-    if (customers) {
-        return (
-            <Container>
-                <Grid container spacing={5} sx={{ mt: 1 }}>
-                    {customers.map((customer: Customer) => {
-                        return (
-                            <CustomerComponent
-                                key={customer._id?.toString()}
-                                customer={customer}
-                            />
-                        );
-                    })}
-                </Grid>
-            </Container>
-        );
-    }
-
-    return null;
+    return (
+        <Container>
+            <Grid container spacing={5} sx={{ mt: 1 }}>
+                {customers.map((customer: Customer) => {
+                    return (
+                        <CustomerComponent
+                            key={customer._id?.toString()}
+                            customer={customer}
+                        />
+                    );
+                })}
+            </Grid>
+        </Container>
+    );
 };
 
 export default Customers;
